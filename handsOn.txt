@@ -1,0 +1,194 @@
+_______________________
+Filling missing values
+_______________________
+
+
+mean - for numeric data 
+----
+df[new_feature]=df[feature].fillna(df[feature].mean())
+
+median - for numeric data 
+-------
+df[new_feature]=df[feature].fillna(df[feature].median())
+
+filling with mode - for categorical data
+-----------------
+mode_value=df[df[feature].notna()][feature].mode()[0]
+
+df[new_feature]=df[feature].fillna(mode_value)
+
+
+
+
+__________________________
+Handing Imbalanced DataSet
+__________________________
+
+Upsampling 
+----------
+from sklearn.utils import resample
+df_minority_upsampled=resample(df_minority,replace=True,
+         n_samples=len(df_majority), ## size of majority dataframe 
+         random_state=42 ## random seed 
+        )
+
+Downsampling
+------------
+
+from sklearn.utils import resample
+df_majority_downsampled=resample(df_majority,replace=False, 
+         n_samples=len(df_minority),
+         random_state=42
+        )
+ 
+
+SMOTE
+-----
+
+from imblearn.over_sampling import SMOTE
+
+oversample=SMOTE()
+X,y=oversample.fit_resample(DataFrame_name[independent_variable_list],final_df[dependent_variable])
+
+oversample_df=pd.concat([X,y],axis=1)
+
+
+
+
+
+__________________
+DATA INTERPOLATION
+___________________
+
+linear data
+------------
+
+import numpy as np
+x=np.array([1,2,3,4,5])
+y=np.array([2,4,6,8,10])
+
+x_new=numpy.linspace(1,5,10) ## create 10 x values using linspace 
+y_interp=numpy.interp(x_new,x,y) ## creates new y values based on the previous data (x,y)
+
+
+Cubic Interpolation With Scipy
+------------------------------
+
+import numpy as np
+
+x=np.array([1,2,3,4,5])
+y=np.array([1,8,27,64,125])
+
+from scipy.interpolate import interp1d
+
+##create a cubic interpolation function
+f=interp1d(x,y,kind='cubic') ## give previous data (x,y) and mention kind 
+
+# interpolate the data
+x_new = np.linspace(1, 5, 10)
+y_interp=f(x_new) 
+
+
+Polynomial Interpolation
+-------------------------
+
+import numpy as np
+
+# create some sample data
+x = np.array([1, 2, 3, 4, 5])
+y = np.array([1, 4, 9, 16, 25])
+
+# interpolate the data using polynomial interpolation
+p=np.polyfit(x,y,2) ## 2 is the degree of polynomial 
+
+x_new = np.linspace(1, 5, 10) # create new x values
+y_interp = np.polyval(p, x_new) # interpolate y values
+
+
+
+
+_______________
+STANDARDIZATION 
+________________
+
+from sklearn.preprocessing import StandardScaler
+scaler=StandardScaler()
+
+array_z = scaler.fit_transform(DataFrame containing features) -> returns numpy array after appling z-score
+
+______________
+NORMALIZATION
+_______________
+
+from sklearn.preprocessing import MinMaxScaler
+min_max=MinMaxScaler()
+
+min_max.fit_transform(DataFrame containing features) -> return numpy array after appling min-max scaler
+
+Making Normailized DataFrame
+----------------------------
+
+from sklearn.preprocessing import normalize
+
+new_dataFrame_name = pandas.DataFrame(normalize(DataFrame containg features),columns=name_list)
+
+______________
+DATA ENCDOING 
+_______________
+
+packages - sklearn.preprocessing 
+
+OHE
+---
+from sklearn.preprocessing import OneHotEncoder
+
+##create an instance of Onehotencoder
+encoder=OneHotEncoder()
+
+## perform fit and transform
+encoded=encoder.fit_transform(DataFrame_containing_features).toarray()
+
+import pandas as pd
+encoder_df=pd.DataFrame(encoded,columns=encoder.get_feature_names_out())
+
+
+
+LABEL ORDINAL
+-------------
+
+from sklearn.preprocessing import LabelEncoder
+
+lbl_encoder=LabelEncoder()
+
+encoded = lbl_encoder.fit_transform(DataFrame_containing_features) ## one feature at a time . 
+
+encoder_df=pd.DataFrame(encoded,columns=name_list)
+
+
+
+ORDINAL ENCODER
+----------------
+
+## ORdinal Encoding
+from sklearn.preprocessing import OrdinalEncoder
+
+# create a sample dataframe with an ordinal variable
+df = pd.DataFrame({
+    'size': ['small', 'medium', 'large', 'medium', 'small', 'large']
+})
+
+## create an instance of ORdinalEncoder and then fit_transform
+encoder=OrdinalEncoder(categories=[['small','medium','large']])
+
+encoded = encoder.fit_transform(df_deg[['size']])
+
+encoder_df=pd.DataFrame(encoded,columns=name_list)
+
+
+
+Target Guided Ordinal Encoding
+-------------------------------
+
+mean_val=df.groupby(categorical_variable)[numeric_target_variable].mean().to_dict()
+
+df[encoded_category]=df[categorical_variable].map(mean_val)
